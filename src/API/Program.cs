@@ -1,4 +1,9 @@
 
+using API.Repositories._Base;
+using API.Repositories.Aluno;
+using API.Services.Aluno;
+using API.Services.Seguranca;
+
 namespace API
 {
     public class Program
@@ -8,6 +13,11 @@ namespace API
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
+
+            builder.Services.AddDbContext<GestaoDbContext>();
+            builder.Services.AddScoped<IAlunoService, AlunoService>();
+            builder.Services.AddScoped<IAlunoRepository, AlunoRepository>();
+            builder.Services.AddScoped<ISegurancaService, SegurancaService>();
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
