@@ -56,8 +56,9 @@ namespace Gestao.Teste
                 Senha = "Mylena@12#"
             };
 
-            _alunoRepositoryMock.Setup(r => r.ListarAlunoPorUsuario(aluno.Usuario))
-                    .Returns(new RetornoAlunoDto { Usuario = aluno.Usuario });
+
+            _alunoRepositoryMock.Setup(r => r.CriarAluno(aluno))
+                            .Returns(new RetornoAlunoDto { Id = -1 });
 
             var resultado = _alunoService.CriarAluno(aluno);
 
@@ -76,12 +77,12 @@ namespace Gestao.Teste
 
             var usuarioOriginal = "jojo";
 
-            _alunoRepositoryMock.Setup(r => r.ListarAlunoPorUsuario(usuarioOriginal))
-                    .Returns(new RetornoAlunoDto());
+            _alunoRepositoryMock.Setup(r => r.AtualizarAluno(aluno, usuarioOriginal))
+                                        .Returns(-2);
 
             var resultado = _alunoService.AtualizarAluno(aluno, usuarioOriginal);
 
-            Assert.Equal(-1, resultado);
+            Assert.Equal(-2, resultado);
         }
     }
 }

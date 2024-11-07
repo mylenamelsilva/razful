@@ -97,7 +97,12 @@ namespace API.Controllers
 
             if (aluno == -1)
             {
-                return BadRequest("Usuário não existente.");
+                return BadRequest("Usuário já em uso.");
+            }
+
+            if (aluno == -2)
+            {
+                return BadRequest("Usuário da rota ''/usuario='' não existente.");
             }
 
             return Ok(model);

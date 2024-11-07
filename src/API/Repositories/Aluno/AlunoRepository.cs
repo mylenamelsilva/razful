@@ -1,6 +1,7 @@
 ﻿using API.DTOs.Aluno;
 using API.Repositories._Base;
 using Dapper;
+using System.Data;
 
 namespace API.Repositories.Aluno
 {
@@ -17,6 +18,20 @@ namespace API.Repositories.Aluno
         {
             var query = AlunoRepositoryQueries.AtualizarAluno;
             using var _conexao = _context.ConexaoQuery();
+
+            var (existeAluno, usuarioRotaValida) = VerificarSeJaExisteUsuario(_conexao, model.Usuario, usuario, "atualizar");
+
+
+            if (usuarioRotaValida != null && usuarioRotaValida is false)
+            {
+                return -2;
+            }
+
+            if (existeAluno)
+            {
+                return -1;
+            }
+
             using var _transacao = _conexao.BeginTransaction();
 
             var filtros = new Dictionary<string, object>()
@@ -43,6 +58,17 @@ namespace API.Repositories.Aluno
         {
             var query = AlunoRepositoryQueries.AdicionarAluno;
             using var _conexao = _context.ConexaoQuery();
+
+            var (existeAluno, _) = VerificarSeJaExisteUsuario(_conexao, model.Usuario, "", "criar");
+
+            if (existeAluno)
+            {
+                return new RetornoAlunoDto()
+                {
+                    Id = -1
+                };
+            }
+
             using var _transacao = _conexao.BeginTransaction();
 
             var filtros = new Dictionary<string, object>()
@@ -74,7 +100,7 @@ namespace API.Repositories.Aluno
         public RetornoAlunoDto? ListarAlunoPorUsuario(string usuario)
         {
             var query = AlunoRepositoryQueries.ListarAlunoPorUsuario;
-            var _conexao = _context.ConexaoQuery();
+            using var _conexao = _context.ConexaoQuery();
 
             var aluno = _conexao.Query<RetornoAlunoDto>(query, new
             {
@@ -109,6 +135,14 @@ namespace API.Repositories.Aluno
         {
             var query = AlunoRepositoryQueries.RemoverAluno;
             using var _conexao = _context.ConexaoQuery();
+
+            var (_, usuarioRotaValida) = VerificarSeJaExisteUsuario(_conexao, "", usuario, "atualizar");
+
+            if (usuarioRotaValida != null && usuarioRotaValida is false)
+            {
+                return -1;
+            }
+
             using var _transacao = _conexao.BeginTransaction();
 
             var alunoRemovido = _conexao.Execute(query, new { USUARIO = usuario}, _transacao);
@@ -132,6 +166,33 @@ namespace API.Repositories.Aluno
             var totalDePaginas = (int)Math.Ceiling((double)totalRegistros / registrosPorPagina);
 
             return totalDePaginas;
+        }
+
+        private (bool, bool?) VerificarSeJaExisteUsuario(IDbConnection conexao, string usuarioAAtualizar, string usuarioRota, string operacao)
+        {
+            var queryExisteAluno = AlunoRepositoryQueries.ListarAlunoPorUsuario;
+
+            var existeUsuario = conexao.Query<RetornoAlunoDto>(queryExisteAluno, new
+            {
+                USUARIO = usuarioAAtualizar
+            }).FirstOrDefault();
+
+            if (operacao == "atualizar")
+            {
+                var usuarioValido = conexao.Query<RetornoAlunoDto>(queryExisteAluno, new
+                {
+                    USUARIO = usuarioRota
+                }).FirstOrDefault();
+
+                if (existeUsuario?.Usuario == usuarioValido?.Usuario)
+                {
+                    existeUsuario = null;
+                }
+
+                return (existeUsuario != null, usuarioValido != null);
+            }
+
+            return (existeUsuario != null, null);
         }
     }
 }
