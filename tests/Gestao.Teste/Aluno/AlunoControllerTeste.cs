@@ -4,7 +4,7 @@ using API.Services.Aluno;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 
-namespace Gestao.Teste
+namespace Gestao.Teste.Aluno
 {
     public class AlunoControllerTeste
     {

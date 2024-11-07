@@ -4,7 +4,7 @@ using API.Services.Aluno;
 using API.Services.Seguranca;
 using Moq;
 
-namespace Gestao.Teste
+namespace Gestao.Teste.Aluno
 {
     public class AlunoServiceTeste
     {
