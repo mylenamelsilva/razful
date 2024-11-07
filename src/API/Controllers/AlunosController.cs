@@ -105,7 +105,7 @@ namespace API.Controllers
 
         [HttpDelete]
         [Produces("application/json")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CriacaoAtualizacaoAlunoDto))]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(List<string>))]
         [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(List<string>))]
         public IActionResult RemoverAluno([FromQuery] string usuario)
