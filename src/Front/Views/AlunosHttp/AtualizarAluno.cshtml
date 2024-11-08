@@ -1,0 +1,39 @@
+﻿@model API.DTOs.Aluno.CriacaoAtualizacaoAlunoDto
+@{
+    ViewData["Title"] = "Atualizar aluno";
+}
+
+@if (ViewData["Mensagem"] != null)
+{
+    <div class="alert alert-danger mb-4" role="alert">
+        @ViewData["Mensagem"]
+    </div>
+}
+
+<form asp-action="AtualizarAluno" method="post">
+    <div class="input-group mb-3">
+        <span class="input-group-text" id="Nome">Nome</span>
+        <input type="text" class="form-control" placeholder="Nome" aria-label="Username" aria-describedby="Nome" asp-for="Nome" value="@Model.Nome">
+    </div>
+    <div class="input-group mb-3">
+        <span class="input-group-text" id="Usuario">Usuario</span>
+        <input type="text" class="form-control" placeholder="Usuario" aria-label="Usuario" aria-describedby="Usuario" asp-for="Usuario" value="@Model.Usuario">
+    </div>
+    <div class="input-group mb-3">
+        <span class="input-group-text" id="Senha">Senha</span>
+        <input type="password" class="form-control" placeholder="Senha" aria-label="Senha" aria-describedby="Senha" asp-for="Senha" value="@Model.Senha">
+    </div>
+    <button type="submit" class="btn btn-success float-end w-25">Salvar</button>
+</form>
+
+@if (ViewData["Erros"] is List<string> erros && erros.Count > 0)
+{
+    <section class="mt-5 fs-5">
+        <ul>
+            @foreach (var erro in erros)
+            {
+                <li class="text-danger mb-2">@erro</li>
+            }
+        </ul>
+    </section>
+}

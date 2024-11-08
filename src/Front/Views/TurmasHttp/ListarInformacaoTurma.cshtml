@@ -1,0 +1,21 @@
+﻿@model API.DTOs.Turma.RetornoTurmaDto
+@{
+    ViewData["Title"] = "Visualizar turma";
+}
+
+<div class="input-group mb-3">
+    <span class="input-group-text" id="Id">Id</span>
+    <input type="text" class="form-control" disabled placeholder="Id" aria-label="Id" aria-describedby="Id" asp-for="Id" value="@Model.Id">
+</div>
+<div class="input-group mb-3">
+    <span class="input-group-text" id="Turma">Turma</span>
+    <input type="text" class="form-control" disabled placeholder="Turma" aria-label="Username" aria-describedby="Turma" asp-for="Turma" value="@Model.Turma">
+</div>
+<div class="input-group mb-3">
+    <span class="input-group-text" id="Ano">Ano da turma</span>
+    <input type="number" class="form-control" disabled placeholder="2024" aria-label="Ano" aria-describedby="Ano" asp-for="Ano" value="@Model.Ano">
+</div>
+<div class="input-group mb-3">
+    <span class="input-group-text" id="CursoId">ID do curso</span>
+    <input type="number" class="form-control" disabled placeholder="1" aria-label="CursoId" aria-describedby="CursoId" asp-for="CursoId" value="@Model.CursoId">
+</div>

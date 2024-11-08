@@ -1,0 +1,77 @@
+﻿@{
+    ViewData["Title"] = "Turmas";
+}
+
+@model API.DTOs.Turma.RetornoTodasTurmasDto;
+
+<a asp-controller="TurmasHttp" asp-action="CriarTurma" class="btn btn-primary">Adicionar Turma</a>
+
+@if (ViewData["Mensagem"] != null)
+{
+    <div class="alert alert-danger mt-3" role="alert">
+        @ViewData["Mensagem"]
+    </div>
+}
+
+@if (TempData["Mensagem"] != null)
+{
+    <div class="alert alert-success mt-3" role="alert">
+        @TempData["Mensagem"]
+    </div>
+}
+
+@foreach (var turma in Model.Turmas)
+{
+    <div class="card mt-5">
+        <div class="card-header">
+            <h5>@turma.Turma</h5>
+            <p>Ano: @turma.Ano</p>
+            <p>CursoId: @turma.CursoId</p>
+        </div>
+        <div class="card-body">
+            <a asp-controller="TurmasHttp" asp-action="AtualizarTurma" asp-route-idTurma="@turma.Id" class="btn btn-warning">Editar</a>
+            <a asp-controller="TurmasHttp" asp-action="ListarInformacaoTurma" asp-route-idTurma="@turma.Id" class="btn btn-dark">Visualizar</a>
+            <a onclick="excluirTurma('@Url.Action("RemoverTurma", "TurmasHttp", new { idTurma = turma.Id })')" class="btn btn-danger">Excluir</a>
+        </div>
+    </div>
+}
+
+<nav>
+    <ul class="pagination justify-content-end mt-4">
+        @if (Model.Pagina > 1)
+        {
+            <li class="page-item">
+                <a class="page-link" tabindex="-1" href="@Url.Action("Index", new { pagina = Model.Pagina - 1, itensPorPagina = 10 })">Anterior</a>
+            </li>
+
+        }
+
+        @if (Model.Pagina < Model.TotalParaPaginacao)
+        {
+            <li class="page-item">
+                <a class="page-link" href="@Url.Action("Index", new { pagina = Model.Pagina + 1, itensPorPagina = 10 })">Próxima</a>
+            </li>
+        }
+    </ul>
+</nav>
+
+
+<script>
+    function excluirTurma(url) {
+        if (confirm('Tem certeza que deseja remover esta turma?')) {
+            fetch(url, {
+                method: 'POST'
+            })
+                .then(response => {
+                    if (response.ok) {
+                        location.reload();
+                    } else {
+                        alert('Erro ao remover a turma.');
+                    }
+                })
+                .catch(error => {
+                    alert('Erro ao remover a turma.');
+                });
+        }
+    }
+</script>
