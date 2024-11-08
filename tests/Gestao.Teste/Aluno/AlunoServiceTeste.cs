@@ -20,7 +20,7 @@ namespace Gestao.Teste.Aluno
         }
 
         [Fact]
-        public void Teste_SenhaDeveSerHash_Retornar60Caracteres()
+        public async Task Teste_SenhaDeveSerHash_Retornar60Caracteres()
         {
             var aluno = new CriacaoAtualizacaoAlunoDto()
             {
@@ -30,10 +30,10 @@ namespace Gestao.Teste.Aluno
             };
 
             _segurancaServiceMock.Setup(s => s.ConverterStringEmHash(aluno.Senha))
-                             .Returns((string senha) => BCrypt.Net.BCrypt.HashPassword(senha));
+                             .ReturnsAsync((string senha) => BCrypt.Net.BCrypt.HashPassword(senha));
 
             _alunoRepositoryMock.Setup(r => r.CriarAluno(It.IsAny<CriacaoAtualizacaoAlunoDto>()))
-                            .Returns((CriacaoAtualizacaoAlunoDto model) => new RetornoAlunoDto
+                            .ReturnsAsync((CriacaoAtualizacaoAlunoDto model) => new RetornoAlunoDto
                             {
                                 Id = 1,
                                 Nome = model.Nome,
@@ -41,13 +41,13 @@ namespace Gestao.Teste.Aluno
                                 Senha = model.Senha
                             });
 
-            var alunoRetornado = _alunoService.CriarAluno(aluno);
+            var alunoRetornado = await _alunoService.CriarAluno(aluno);
 
             Assert.Equal(60, alunoRetornado.Senha.Length);
         }
 
         [Fact]
-        public void Teste_NaoPodeCadastrarUsuarioQueJaExiste_RetornarIdNegativo()
+        public async Task Teste_NaoPodeCadastrarUsuarioQueJaExiste_RetornarIdNegativo()
         {
             var aluno = new CriacaoAtualizacaoAlunoDto()
             {
@@ -58,15 +58,15 @@ namespace Gestao.Teste.Aluno
 
 
             _alunoRepositoryMock.Setup(r => r.CriarAluno(aluno))
-                            .Returns(new RetornoAlunoDto { Id = -1 });
+                            .ReturnsAsync(new RetornoAlunoDto { Id = -1 });
 
-            var resultado = _alunoService.CriarAluno(aluno);
+            var resultado = await _alunoService.CriarAluno(aluno);
 
             Assert.Equal(-1, resultado.Id);
         }
 
         [Fact]
-        public void Teste_NaoPodeAtualizarDeUsuarioQueNaoExiste_RetornarIdNegativo()
+        public async Task Teste_NaoPodeAtualizarDeUsuarioQueNaoExiste_RetornarIdNegativo()
         {
             var aluno = new CriacaoAtualizacaoAlunoDto()
             {
@@ -78,9 +78,9 @@ namespace Gestao.Teste.Aluno
             var usuarioOriginal = "jojo";
 
             _alunoRepositoryMock.Setup(r => r.AtualizarAluno(aluno, usuarioOriginal))
-                                        .Returns(-2);
+                                        .ReturnsAsync(-2);
 
-            var resultado = _alunoService.AtualizarAluno(aluno, usuarioOriginal);
+            var resultado = await _alunoService.AtualizarAluno(aluno, usuarioOriginal);
 
             Assert.Equal(-2, resultado);
         }

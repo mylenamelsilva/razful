@@ -17,7 +17,7 @@ namespace Gestao.Teste.Turma
         }
 
         [Fact]
-        public void Teste_NaoPodeCadastrarMesmaTurma_DeveRetornarIdNegativo()
+        public async Task Teste_NaoPodeCadastrarMesmaTurma_DeveRetornarIdNegativo()
         {
             var turma = new CriacaoAtualizacaoTurmaDto()
             {
@@ -27,9 +27,9 @@ namespace Gestao.Teste.Turma
             };
 
             _TurmaRepositoryMock.Setup(r => r.CriarTurma(turma))
-                                        .Returns(new RetornoTurmaDto { Id = -1 });
+                                        .ReturnsAsync(new RetornoTurmaDto { Id = -1 });
 
-            var resultado = _TurmaService.CriarTurma(turma);
+            var resultado = await _TurmaService.CriarTurma(turma);
 
             Assert.Equal(-1, resultado.Id);
         }
