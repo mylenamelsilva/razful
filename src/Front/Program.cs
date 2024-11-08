@@ -18,6 +18,7 @@ namespace Front
 
             builder.Services.AddScoped<AlunoHttpService>();
             builder.Services.AddScoped<TurmaHttpService>();
+            builder.Services.AddScoped<AlunoTurmaViewService>();
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

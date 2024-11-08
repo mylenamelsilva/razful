@@ -18,7 +18,7 @@ namespace Gestao.Teste.Aluno
         }
 
         [Fact]
-        public void Teste_SenhaInvalida_DeveDarErro()
+        public async Task Teste_SenhaInvalida_DeveDarErro()
         {
             var aluno = new CriacaoAtualizacaoAlunoDto()
             {
@@ -29,7 +29,7 @@ namespace Gestao.Teste.Aluno
             var mensagemErro = "A senha precisa conter, no mínimo, 8 caracteres com uma letra maiúscula e um caractere especial";
             _alunoController.ModelState.AddModelError("Senha", mensagemErro);
 
-            var resultado = _alunoController.CriarAluno(aluno);
+            var resultado = await _alunoController.CriarAluno(aluno);
 
             var badRequestResult = Assert.IsType<BadRequestObjectResult>(resultado);
 
@@ -39,7 +39,7 @@ namespace Gestao.Teste.Aluno
         }
 
         [Fact]
-        public void Teste_SenhaValida_DevePassar()
+        public async Task Teste_SenhaValida_DevePassar()
         {
             var aluno = new CriacaoAtualizacaoAlunoDto()
             {
@@ -49,9 +49,9 @@ namespace Gestao.Teste.Aluno
             };
             var mensagemErro = "A senha precisa conter, no mínimo, 8 caracteres com uma letra maiúscula e um caractere especial";
             _alunoServiceMock.Setup(s => s.CriarAluno(It.IsAny<CriacaoAtualizacaoAlunoDto>()))
-                                    .Returns(new RetornoAlunoDto { Id = 1 });
+                                    .ReturnsAsync(new RetornoAlunoDto { Id = 1 });
 
-            var resultado = _alunoController.CriarAluno(aluno);
+            var resultado = await _alunoController.CriarAluno(aluno);
 
             var okObjectResult = Assert.IsType<CreatedAtActionResult>(resultado);
 
@@ -61,7 +61,7 @@ namespace Gestao.Teste.Aluno
         }
 
         [Fact]
-        public void Teste_NaoPodeCadastrarUsuarioQueJaExiste_RetornarMensagemErro()
+        public async Task Teste_NaoPodeCadastrarUsuarioQueJaExiste_RetornarMensagemErro()
         {
             var aluno = new CriacaoAtualizacaoAlunoDto()
             {
@@ -71,11 +71,11 @@ namespace Gestao.Teste.Aluno
             };
 
             _alunoServiceMock.Setup(s => s.CriarAluno(It.IsAny<CriacaoAtualizacaoAlunoDto>()))
-                             .Returns(new RetornoAlunoDto { Id = -1 });
+                             .ReturnsAsync(new RetornoAlunoDto { Id = -1 });
 
             string mensagemErro = "Usuário já em uso.";
 
-            var resultado = _alunoController.CriarAluno(aluno);
+            var resultado = await _alunoController.CriarAluno(aluno);
 
             var objectResult = Assert.IsType<BadRequestObjectResult>(resultado);
             Assert.Equal(400, objectResult.StatusCode);
@@ -84,7 +84,7 @@ namespace Gestao.Teste.Aluno
         }
 
         [Fact]
-        public void Teste_NaoPodeAtualizarDeUsuarioQueNaoExiste_RetornarMensagemErro()
+        public async Task Teste_NaoPodeAtualizarDeUsuarioQueNaoExiste_RetornarMensagemErro()
         {
             var aluno = new CriacaoAtualizacaoAlunoDto()
             {
@@ -96,11 +96,11 @@ namespace Gestao.Teste.Aluno
             var usuarioOriginal = "jojo";
 
             _alunoServiceMock.Setup(s => s.AtualizarAluno(It.IsAny<CriacaoAtualizacaoAlunoDto>(), usuarioOriginal))
-                             .Returns(-2);
+                             .ReturnsAsync(-2);
 
             string mensagemErro = "Usuário da rota ''/usuario='' não existente.";
 
-            var resultado = _alunoController.AtualizarAluno(aluno, usuarioOriginal);
+            var resultado = await _alunoController.AtualizarAluno(aluno, usuarioOriginal);
 
             var objectResult = Assert.IsType<BadRequestObjectResult>(resultado);
             Assert.Equal(400, objectResult.StatusCode);

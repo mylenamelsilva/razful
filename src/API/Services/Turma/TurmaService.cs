@@ -13,33 +13,33 @@ namespace API.Services.Turma
             _turmaRepository = turmaRepository;
         }
 
-        public int AtualizarTurma(CriacaoAtualizacaoTurmaDto model, int idTurma)
+        public async Task<int> AtualizarTurma(CriacaoAtualizacaoTurmaDto model, int idTurma)
         {
-            var turmaAtualizada = _turmaRepository.AtualizarTurma(model, idTurma);
+            var turmaAtualizada = await _turmaRepository.AtualizarTurma(model, idTurma);
             return turmaAtualizada;
         }
 
-        public RetornoTurmaDto CriarTurma(CriacaoAtualizacaoTurmaDto model)
+        public async Task<RetornoTurmaDto> CriarTurma(CriacaoAtualizacaoTurmaDto model)
         {
-            var turma = _turmaRepository.CriarTurma(model);
+            var turma = await _turmaRepository.CriarTurma(model);
             return turma;
         }
 
-        public RetornoTodasTurmasDto ListarTodasTurmas(int pagina, int registrosPorPagina)
+        public async Task<RetornoTodasTurmasDto> ListarTodasTurmas(int pagina, int registrosPorPagina)
         {
-            var listaAlunos = _turmaRepository.ListarTodasTurmas(pagina, registrosPorPagina);
+            var listaAlunos = await _turmaRepository.ListarTodasTurmas(pagina, registrosPorPagina);
             return listaAlunos;
         }
 
-        public RetornoTurmaDto? ListarTurmaPorId(int idTurma)
+        public async Task<RetornoTurmaDto?> ListarTurmaPorId(int idTurma)
         {
-            var aluno = _turmaRepository.ListarTurmaPorId(idTurma);
+            var aluno = await _turmaRepository.ListarTurmaPorId(idTurma);
             return aluno;
         }
 
-        public int RemoverTurma(int idTurma)
+        public async Task<int> RemoverTurma(int idTurma)
         {
-            var turmaRemovida = _turmaRepository.RemoverTurma(idTurma);
+            var turmaRemovida = await _turmaRepository.RemoverTurma(idTurma);
             return turmaRemovida;
         }
     }

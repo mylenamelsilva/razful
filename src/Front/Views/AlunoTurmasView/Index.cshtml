@@ -1,0 +1,77 @@
+﻿@{
+    ViewData["Title"] = "Associações";
+}
+
+@model API.DTOs.AlunoTurma.RetornoTodasAssociacoesDto
+
+<a asp-controller="AlunoTurmasView" asp-action="CriarAssociacao" class="btn btn-primary">Adicionar associação</a>
+
+@if (ViewData["Mensagem"] != null)
+{
+    <div class="alert alert-danger mt-3" role="alert">
+        @ViewData["Mensagem"]
+    </div>
+}
+
+@if (TempData["Mensagem"] != null)
+{
+    <div class="alert alert-success mt-3" role="alert">
+        @TempData["Mensagem"]
+    </div>
+}
+
+@foreach (var turma in Model.Associacoes)
+{
+    <div class="card mt-5">
+        <div class="card-header">
+            <h5>@turma.Turma</h5>
+            <p>CursoId: @turma.CursoId</p>
+            <p>Alunos: @turma.Alunos</p>
+        </div>
+        <div class="card-body">
+            <a asp-controller="AlunoTurmasView" asp-action="AtualizarAssociacao" asp-route-turma="@turma.Turma" class="btn btn-warning">Editar</a>
+            <a asp-controller="AlunoTurmasView" asp-action="ListarAlunosPorTurma" asp-route-turma="@turma.Turma" class="btn btn-dark">Visualizar alunos associados</a>
+             <a onclick="excluirAssociacao('@Url.Action("RemoverTodaAssociacao", "AlunoTurmasView", new { turma = turma.Turma })')" class="btn btn-danger">Excluir toda a associação</a>
+        </div>
+    </div>
+}
+
+<nav>
+    <ul class="pagination justify-content-end mt-4">
+        @if (Model.Pagina > 1)
+        {
+            <li class="page-item">
+                <a class="page-link" tabindex="-1" href="@Url.Action("Index", new { pagina = Model.Pagina - 1, itensPorPagina = 10 })">Anterior</a>
+            </li>
+
+        }
+
+        @if (Model.Pagina < Model.TotalParaPaginacao)
+        {
+            <li class="page-item">
+                <a class="page-link" href="@Url.Action("Index", new { pagina = Model.Pagina + 1, itensPorPagina = 10 })">Próxima</a>
+            </li>
+        }
+    </ul>
+</nav>
+
+
+<script>
+    function excluirAssociacao(url) {
+        if (confirm('Tem certeza que deseja remover esta associação?')) {
+            fetch(url, {
+                method: 'POST'
+            })
+                .then(response => {
+                    if (response.ok) {
+                        location.reload();
+                    } else {
+                        alert('Erro ao remover a associação.');
+                    }
+                })
+                .catch(error => {
+                    alert('Erro ao remover a associação.');
+                });
+        }
+    }
+</script>

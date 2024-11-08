@@ -5,14 +5,14 @@ namespace API.DTOs.Aluno
 {
     public class CriacaoAtualizacaoAlunoDto : IValidatableObject
     {
-        [Required]
-        [MaxLength(255)]
+        [Required(ErrorMessage = "O campo Nome é obrigatório.")]
+        [MaxLength(255, ErrorMessage = "O campo Nome deve ter no máximo 255 caracteres.")]
         public string Nome { get; set; }
-        [Required]
-        [MaxLength(45)]
+        [Required(ErrorMessage = "O campo Usuario é obrigatório.")]
+        [MaxLength(45, ErrorMessage = "O campo Usuario deve ter no máximo 45 caracteres.")]
         public string Usuario { get; set; }
-        [Required]
-        [MinLength(8)]
+        [Required(ErrorMessage = "O campo Senha é obrigatório.")]
+        [MinLength(8, ErrorMessage = "O campo Senha deve ter no mínimo 8 caracteres.")]
         public string Senha { get; set; }
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)

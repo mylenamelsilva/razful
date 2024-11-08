@@ -2,6 +2,6 @@
 {
     public interface ISegurancaService
     {
-        public string ConverterStringEmHash(string senha);
+        public Task<string> ConverterStringEmHash(string senha);
     }
 }

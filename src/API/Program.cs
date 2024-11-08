@@ -1,8 +1,10 @@
 
 using API.Repositories._Base;
 using API.Repositories.Aluno;
+using API.Repositories.AlunoTurma;
 using API.Repositories.Turma;
 using API.Services.Aluno;
+using API.Services.AlunoTurma;
 using API.Services.Seguranca;
 using API.Services.Turma;
 
@@ -22,6 +24,8 @@ namespace API
             builder.Services.AddScoped<ISegurancaService, SegurancaService>();
             builder.Services.AddScoped<ITurmaRepository, TurmaRepository>();
             builder.Services.AddScoped<ITurmaService, TurmaService>();
+            builder.Services.AddScoped<IAlunoTurmaService, AlunoTurmaService>();
+            builder.Services.AddScoped<IAlunoTurmaRepository, AlunoTurmaRepository>();
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

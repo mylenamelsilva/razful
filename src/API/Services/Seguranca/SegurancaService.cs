@@ -2,7 +2,7 @@
 {
     public class SegurancaService : ISegurancaService
     {
-        public string ConverterStringEmHash(string senha)
+        public async Task<string> ConverterStringEmHash(string senha)
         {
             string senhaHasheada = BCrypt.Net.BCrypt.HashPassword(senha);
 

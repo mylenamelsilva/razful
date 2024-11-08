@@ -1,0 +1,46 @@
+﻿@model Front.Models.AlunoTurma.DropdownAlunoTurmaViewModel;
+
+@{
+    ViewData["Title"] = "Atualizar associação";
+}
+
+@if (TempData["Mensagem"] != null)
+{
+    <div class="alert alert-danger mb-4" role="alert">
+        @TempData["Mensagem"]
+    </div>
+}
+
+<form asp-action="AtualizarAssociacao" method="post" class="needs-validation" novalidate>
+    <div class="form-group">
+        <label for="Aluno">Aluno</label>
+        <select asp-for="Aluno" class="form-control select-scroll" asp-items="Model.Alunos" required>
+            <option value="">Selecione um aluno</option>
+        </select>
+        <div class="invalid-feedback">
+            Por favor, selecione um aluno.
+        </div>
+    </div>
+    <div class="form-group mt-4">
+        <label for="Turma">Turma</label>
+        <select asp-for="Turma" class="form-control select-scroll" asp-items="Model.Turmas" required>
+            <option value="">Selecione uma turma</option>
+        </select>
+        <div class="invalid-feedback">
+            Por favor, selecione uma turma.
+        </div>
+    </div>
+    <button type="submit" class="btn btn-primary mt-4">Associar</button>
+</form>
+
+@if (TempData["Erros"] is string[] erros && erros.Length > 0)
+{
+    <section class="mt-5 fs-5">
+        <ul>
+            @foreach (var erro in erros)
+            {
+                <li class="text-danger mb-2">@erro</li>
+            }
+        </ul>
+    </section>
+}

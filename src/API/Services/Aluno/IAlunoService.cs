@@ -4,10 +4,10 @@ namespace API.Services.Aluno
 {
     public interface IAlunoService
     {
-        public RetornoAlunoDto CriarAluno(CriacaoAtualizacaoAlunoDto model);
-        public int AtualizarAluno(CriacaoAtualizacaoAlunoDto model, string usuario);
-        public RetornoAlunoDto? ListarAlunoPorUsuario(string usuario);
-        public RetornoTodosAlunosDto ListarTodosAlunos(int pagina, int registrosPorPagina);
-        public int RemoverAluno(string usuario);
+        public Task<RetornoAlunoDto> CriarAluno(CriacaoAtualizacaoAlunoDto model);
+        public Task<int> AtualizarAluno(CriacaoAtualizacaoAlunoDto model, string usuario);
+        public Task <RetornoAlunoDto?> ListarAlunoPorUsuario(string usuario);
+        public Task<RetornoTodosAlunosDto> ListarTodosAlunos(int pagina, int registrosPorPagina);
+        public Task<int> RemoverAluno(string usuario);
     }
 }

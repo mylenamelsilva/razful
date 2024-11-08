@@ -1,5 +1,5 @@
 ﻿using API.DTOs.Turma;
-using Front.Models;
+using Front.Models.Turma;
 
 namespace Front.Services
 {

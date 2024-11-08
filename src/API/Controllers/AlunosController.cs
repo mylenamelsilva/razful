@@ -20,7 +20,7 @@ namespace API.Controllers
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(RetornoAlunoDto))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(List<string>))]
         [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(List<string>))]
-        public IActionResult CriarAluno(CriacaoAtualizacaoAlunoDto model)
+        public async Task<IActionResult> CriarAluno(CriacaoAtualizacaoAlunoDto model)
         {
             if (!ModelState.IsValid)
             {
@@ -32,7 +32,7 @@ namespace API.Controllers
                 return BadRequest(erros);
             }
 
-            var aluno = _alunoService.CriarAluno(model);
+            var aluno = await _alunoService.CriarAluno(model);
 
             return aluno.Id switch
             {
@@ -45,18 +45,18 @@ namespace API.Controllers
         [HttpGet]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(RetornoTodosAlunosDto))]
-        public IActionResult ListarAlunos([FromQuery] int pagina = 1, [FromQuery] int registrosPorPagina = 10)
+        public async Task<IActionResult> ListarAlunos([FromQuery] int pagina = 1, [FromQuery] int registrosPorPagina = 10)
         {
-            return Ok(_alunoService.ListarTodosAlunos(pagina,   registrosPorPagina));
+            return Ok(await _alunoService.ListarTodosAlunos(pagina,   registrosPorPagina));
         }
 
         [HttpGet]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(RetornoAlunoDto))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public IActionResult ListarAlunoPorUsuario([FromQuery] string usuario)
+        public async Task<IActionResult> ListarAlunoPorUsuario([FromQuery] string usuario)
         {
-            var aluno = _alunoService.ListarAlunoPorUsuario(usuario);
+            var aluno = await _alunoService.ListarAlunoPorUsuario(usuario);
 
             return aluno != null ? Ok(aluno) : NotFound();
         }
@@ -66,7 +66,7 @@ namespace API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CriacaoAtualizacaoAlunoDto))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(List<string>))]
         [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(List<string>))]
-        public IActionResult AtualizarAluno(CriacaoAtualizacaoAlunoDto model, [FromQuery] string usuario)
+        public async Task<IActionResult> AtualizarAluno(CriacaoAtualizacaoAlunoDto model, [FromQuery] string usuario)
         {
             if (!ModelState.IsValid)
             {
@@ -78,7 +78,7 @@ namespace API.Controllers
                 return BadRequest(erros);
             }
 
-            var aluno = _alunoService.AtualizarAluno(model, usuario);
+            var aluno = await _alunoService.AtualizarAluno(model, usuario);
 
             return aluno switch
             {
@@ -94,9 +94,9 @@ namespace API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(List<string>))]
         [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(List<string>))]
-        public IActionResult RemoverAluno([FromQuery] string usuario)
+        public async Task<IActionResult> RemoverAluno([FromQuery] string usuario)
         {
-            var aluno = _alunoService.RemoverAluno(usuario);
+            var aluno = await _alunoService.RemoverAluno(usuario);
 
             return aluno switch
             {

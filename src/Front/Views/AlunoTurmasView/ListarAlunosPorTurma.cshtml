@@ -1,0 +1,57 @@
+﻿@model Front.Models.AlunoTurma.AlunosAssociadosViewModel;
+@{
+    ViewData["Title"] = "Visualizar aluno";
+}
+
+@foreach (var aluno in Model.Alunos)
+{
+    <div class="card mt-5">
+        <div class="card-header">
+            <h5>@aluno.Nome</h5>
+            <p>Usuário associado: @aluno.Usuario</p>
+        </div>
+        <div class="card-body">
+            <a onclick="excluirAssociacao('@Url.Action("RemoverAssociacao", "AlunoTurmasView", new { turma = Model.Turma, aluno = aluno.Usuario })')" class="btn btn-danger">Excluir</a>
+        </div>
+    </div>
+}
+
+<nav>
+    <ul class="pagination justify-content-end mt-4">
+        @if (Model.Pagina > 1)
+        {
+            <li class="page-item">
+                <a class="page-link" tabindex="-1" href="@Url.Action("Index", new { pagina = Model.Pagina - 1, itensPorPagina = 10 })">Anterior</a>
+            </li>
+
+        }
+
+        @if (Model.Pagina < Model.TotalParaPaginacao)
+        {
+            <li class="page-item">
+                <a class="page-link" href="@Url.Action("Index", new { pagina = Model.Pagina + 1, itensPorPagina = 10 })">Próxima</a>
+            </li>
+        }
+    </ul>
+</nav>
+
+
+<script>
+    function excluirAssociacao(url) {
+        if (confirm('Tem certeza que deseja remover esta associação?')) {
+            fetch(url, {
+                method: 'POST'
+            })
+                .then(response => {
+                    if (response.ok) {
+                        window.location.href = '/AlunoTurmasView/Index';
+                    } else {
+                        alert('Erro ao remover a associação.');
+                    }
+                })
+                .catch(error => {
+                    alert('Erro ao remover a associação.');
+                });
+        }
+    }
+</script>

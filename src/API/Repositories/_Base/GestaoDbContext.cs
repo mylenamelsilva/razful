@@ -31,10 +31,18 @@ namespace API.Repositories._Base
                        .HasKey(at => new { at.Aluno_Id, at.Turma_Id });
 
             modelBuilder.Entity<AlunoModel>()
-                .HasMany(e => e.AlunoTurmas);
+                .HasMany(e => e.AlunoTurmas);  
+            
+            modelBuilder.Entity<AlunoModel>()
+                .HasIndex(e => e.Usuario)
+                .IsUnique();
 
             modelBuilder.Entity<TurmaModel>()
                .HasMany(e => e.AlunoTurmas);
+            
+            modelBuilder.Entity<TurmaModel>()
+                .HasIndex(e => e.Turma)
+                .IsUnique();
         }
 
         public IDbConnection ConexaoQuery()
