@@ -4,7 +4,7 @@ using API.Services.Aluno;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 
-namespace Gestao.Teste
+namespace Gestao.Teste.Aluno
 {
     public class AlunoControllerTeste
     {
@@ -96,9 +96,9 @@ namespace Gestao.Teste
             var usuarioOriginal = "jojo";
 
             _alunoServiceMock.Setup(s => s.AtualizarAluno(It.IsAny<CriacaoAtualizacaoAlunoDto>(), usuarioOriginal))
-                             .Returns(-1);
+                             .Returns(-2);
 
-            string mensagemErro = "Usuário não existente.";
+            string mensagemErro = "Usuário da rota ''/usuario='' não existente.";
 
             var resultado = _alunoController.AtualizarAluno(aluno, usuarioOriginal);
 
