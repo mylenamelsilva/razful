@@ -1,0 +1,21 @@
+﻿@model API.DTOs.Aluno.RetornoAlunoDto
+@{
+    ViewData["Title"] = "Visualizar aluno";
+}
+
+<div class="input-group mb-3">
+    <span class="input-group-text" id="Id">Id</span>
+    <input type="text" class="form-control" disabled placeholder="Id" aria-label="Id" aria-describedby="Id" asp-for="Id" value="@Model.Id">
+</div>
+<div class="input-group mb-3">
+    <span class="input-group-text" id="Nome">Nome</span>
+    <input type="text" class="form-control" disabled placeholder="Nome" aria-label="Username" aria-describedby="Nome" asp-for="Nome" value="@Model.Nome">
+</div>
+<div class="input-group mb-3">
+    <span class="input-group-text" id="Usuario">Usuario</span>
+    <input type="text" class="form-control" disabled placeholder="Usuario" aria-label="Usuario" aria-describedby="Usuario" asp-for="Usuario" value="@Model.Usuario">
+</div>
+<div class="input-group mb-3">
+    <span class="input-group-text" id="Senha">Senha</span>
+    <input type="password" class="form-control" disabled placeholder="Senha" aria-label="Senha" aria-describedby="Senha" asp-for="Senha" value="@Model.Senha">
+</div>

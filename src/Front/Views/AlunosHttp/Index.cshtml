@@ -1,0 +1,76 @@
+﻿@{
+    ViewData["Title"] = "Alunos";
+}
+
+@model API.DTOs.Aluno.RetornoTodosAlunosDto;
+
+<a asp-controller="AlunosHttp" asp-action="CriarAluno" class="btn btn-primary">Adicionar Aluno</a>
+
+@if (ViewData["Mensagem"] != null)
+{
+    <div class="alert alert-danger mt-3" role="alert">
+        @ViewData["Mensagem"]
+    </div>
+}
+
+@if (TempData["Mensagem"] != null)
+{
+    <div class="alert alert-success mt-3" role="alert">
+        @TempData["Mensagem"]
+    </div>
+}
+
+@foreach (var aluno in Model.Alunos)
+{
+    <div class="card mt-5">
+        <div class="card-header">
+            <h5>@aluno.Nome</h5>
+            <p>Usuário: @aluno.Usuario</p>
+        </div>
+        <div class="card-body">
+            <a asp-controller="AlunosHttp" asp-action="AtualizarAluno" asp-route-usuario="@aluno.Usuario" class="btn btn-warning">Editar</a>
+            <a asp-controller="AlunosHttp" asp-action="ListarInformacaoAluno" asp-route-usuario="@aluno.Usuario" class="btn btn-dark">Visualizar</a>
+            <a onclick="excluirAluno('@Url.Action("RemoverAluno", "AlunosHttp", new { usuario = aluno.Usuario })')" class="btn btn-danger">Excluir</a>
+        </div>
+    </div>
+}
+
+<nav>
+    <ul class="pagination justify-content-end mt-4">
+        @if (Model.Pagina > 1)
+        {
+            <li class="page-item">
+                <a class="page-link" tabindex="-1" href="@Url.Action("Index", new { pagina = Model.Pagina - 1, itensPorPagina = 10 })">Anterior</a>
+            </li>
+
+        }
+
+        @if (Model.Pagina < Model.TotalParaPaginacao)
+        {
+            <li class="page-item">
+                <a class="page-link" href="@Url.Action("Index", new { pagina = Model.Pagina + 1, itensPorPagina = 10 })">Próxima</a>
+            </li>
+        }
+    </ul>
+</nav>
+
+
+<script>
+    function excluirAluno(url) {
+        if (confirm('Tem certeza que deseja remover este aluno?')) {
+            fetch(url, {
+                method: 'POST'
+            })
+                .then(response => {
+                    if (response.ok) {
+                        location.reload();
+                    } else {
+                        alert('Erro ao remover o aluno.');
+                    }
+                })
+                .catch(error => {
+                    alert('Erro ao remover o aluno.');
+                });
+        }
+    }
+</script>
