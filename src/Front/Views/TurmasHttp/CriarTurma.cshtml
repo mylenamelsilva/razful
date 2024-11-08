@@ -1,0 +1,39 @@
+﻿@model API.DTOs.Turma.CriacaoAtualizacaoTurmaDto;
+@{
+    ViewData["Title"] = "Criar Turma";
+}
+
+@if (ViewData["Mensagem"] != null)
+{
+    <div class="alert alert-danger mb-4" role="alert">
+        @ViewData["Mensagem"]
+    </div>
+}
+
+<form asp-action="CriarTurma" method="post">
+    <div class="input-group mb-3">
+        <span class="input-group-text" id="Turma">Turma</span>
+        <input type="text" class="form-control" placeholder="Turma" aria-label="Turma" aria-describedby="Turma" asp-for="Turma">
+    </div>
+    <div class="input-group mb-3">
+        <span class="input-group-text" id="Ano">Ano da turma</span>
+        <input type="number" class="form-control" placeholder="2024" aria-label="Ano" aria-describedby="Ano" asp-for="Ano">
+    </div>
+    <div class="input-group mb-3">
+        <span class="input-group-text" id="CursoId">ID do curso</span>
+        <input type="number" class="form-control" placeholder="1" aria-label="CursoId" aria-describedby="CursoId" asp-for="CursoId">
+    </div>
+    <button type="submit" class="btn btn-success float-end w-25">Salvar</button>
+</form>
+
+@if (ViewData["Erros"] is List<string> erros && erros.Count > 0)
+{
+    <section class="mt-5 fs-5">
+        <ul>
+            @foreach (var erro in erros)
+            {
+                <li class="text-danger mb-2">@erro</li>
+            }
+        </ul>
+    </section>
+}
