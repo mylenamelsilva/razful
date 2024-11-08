@@ -1,6 +1,9 @@
 # Gestão de Alunos e Turmas
 
 Aplicação que envolve API e front-end com o Razor.
+![Front-end com Razor](https://github.com/user-attachments/assets/9f09ef08-87aa-4b8c-bbd2-9235dd53935f)
+
+![API](https://github.com/user-attachments/assets/5690b702-0c55-41b5-9cbb-6d83ae9a0488)
 
 ----
 
