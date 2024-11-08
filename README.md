@@ -105,12 +105,12 @@ O front-end é um projeto MVC e consiste nas seguintes camadas:
    - `dotnet run`
    - `https://localhost:7292/`
 
-  - Para rodar simultaneamente, você pode:
-    -   Ir no **Solution Explorer** (`.sln`)
-    -   Escolher a opção **Set Startup Projects**
-    -   Definir o projeto API e Front como "Start" no **Action**
-    -   Clicar em aplicar e em ok
-    -   Após isso é só clicar em **Start** para rodar a aplicação
+  **Para rodar simultaneamente, você pode**:
+  - Ir no **Solution Explorer** (`.sln`)
+  - Escolher a opção **Set Startup Projects**
+  - Definir o projeto API e Front como "Start" no **Action**
+  - Clicar em aplicar e em ok
+  - Após isso é só clicar em **Start** para rodar a aplicação
 
 ----
 
