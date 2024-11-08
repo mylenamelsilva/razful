@@ -15,16 +15,16 @@ namespace API.Repositories.Aluno
             _context = context;
         }
 
-        public int AtualizarAluno(CriacaoAtualizacaoAlunoDto model, string usuario)
+        public async Task<int> AtualizarAluno(CriacaoAtualizacaoAlunoDto model, string usuario)
         {
             using var _conexao = _context.ConexaoQuery();
 
-            if (!UsuarioValido(_conexao, usuario))
+            if (!await UsuarioValido(_conexao, usuario))
             {
                 return -2;
             }
 
-            if (UsuarioJaExiste(_conexao, model.Usuario) && model.Usuario != usuario)
+            if (await UsuarioJaExiste(_conexao, model.Usuario) && model.Usuario != usuario)
             {
                 return -1;
             }
@@ -40,7 +40,7 @@ namespace API.Repositories.Aluno
                 { "USUARIO_INICIAL", usuario },
             };
 
-            var linhaAfetada = _conexao.Execute(query, filtros, _transacao);
+            var linhaAfetada = await _conexao.ExecuteAsync(query, filtros, _transacao);
 
             if (linhaAfetada == 0)
             {
@@ -52,11 +52,11 @@ namespace API.Repositories.Aluno
             return linhaAfetada;
         }
 
-        public RetornoAlunoDto CriarAluno(CriacaoAtualizacaoAlunoDto model)
+        public async Task<RetornoAlunoDto> CriarAluno(CriacaoAtualizacaoAlunoDto model)
         {
             using var _conexao = _context.ConexaoQuery();
 
-            if (UsuarioJaExiste(_conexao, model.Usuario))
+            if (await UsuarioJaExiste(_conexao, model.Usuario))
             {
                 return new RetornoAlunoDto { Id = -1 };
             }
@@ -71,7 +71,7 @@ namespace API.Repositories.Aluno
                 { "SENHA", model.Senha }
             };
 
-            var idAluno = _conexao.ExecuteScalar<int>(query, filtros, _transacao);
+            var idAluno = await _conexao.ExecuteScalarAsync<int>(query, filtros, _transacao);
 
             if (idAluno <= 0)
             {
@@ -90,12 +90,12 @@ namespace API.Repositories.Aluno
             };
         }
 
-        public RetornoAlunoDto? ListarAlunoPorUsuario(string usuario)
+        public async Task<RetornoAlunoDto?> ListarAlunoPorUsuario(string usuario)
         {
             var query = AlunoRepositoryQueries.ListarAlunoPorUsuario;
             using var _conexao = _context.ConexaoQuery();
 
-            var aluno = _conexao.QuerySingleOrDefault<RetornoAlunoDto>(query, new
+            var aluno = await _conexao.QuerySingleOrDefaultAsync<RetornoAlunoDto>(query, new
             {
                 USUARIO = usuario
             });
@@ -103,7 +103,7 @@ namespace API.Repositories.Aluno
             return aluno;
         }
 
-        public RetornoTodosAlunosDto ListarTodosAlunos(int pagina, int registrosPorPagina)
+        public async Task<RetornoTodosAlunosDto> ListarTodosAlunos(int pagina, int registrosPorPagina)
         {
             var query = AlunoRepositoryQueries.ListarAlunosPorPagina;
             using var _conexao = _context.ConexaoQuery();
@@ -114,21 +114,21 @@ namespace API.Repositories.Aluno
                 { "PAGINA", pagina }
             };
 
-            var listaAlunos = _conexao.Query<RetornoAlunoDto>(query, filtros).ToList();
+            var listaAlunos = (await _conexao.QueryAsync<RetornoAlunoDto>(query, filtros)).ToList();
 
             return new RetornoTodosAlunosDto()
             {
                 Pagina = pagina,
-                TotalParaPaginacao = ContagemTotalAlunos(registrosPorPagina),
+                TotalParaPaginacao = await ContagemTotalAlunos(registrosPorPagina),
                 Alunos = listaAlunos
             };
         }
 
-        public int RemoverAluno(string usuario)
+        public async Task<int> RemoverAluno(string usuario)
         {
             using var _conexao = _context.ConexaoQuery();
 
-            if (!UsuarioValido(_conexao, usuario))
+            if (!await UsuarioValido(_conexao, usuario))
             {
                 return -1;
             }
@@ -136,7 +136,7 @@ namespace API.Repositories.Aluno
             var query = AlunoRepositoryQueries.RemoverAluno;
             using var _transacao = _conexao.BeginTransaction();
 
-            var linhaAfetada = _conexao.Execute(query, new { USUARIO = usuario}, _transacao);
+            var linhaAfetada = await _conexao.ExecuteAsync(query, new { USUARIO = usuario}, _transacao);
 
             if (linhaAfetada == 0)
             {
@@ -148,28 +148,28 @@ namespace API.Repositories.Aluno
             return linhaAfetada;
         }
 
-        private int ContagemTotalAlunos(int registrosPorPagina)
+        private async Task<int> ContagemTotalAlunos(int registrosPorPagina)
         {
             var query = AlunoRepositoryQueries.ContagemAlunos;
             using var _conexao = _context.ConexaoQuery();
 
-            var totalRegistros = _conexao.ExecuteScalar<int>(query);
+            var totalRegistros = await _conexao.ExecuteScalarAsync<int>(query);
             var totalDePaginas = (int)Math.Ceiling((double)totalRegistros / registrosPorPagina);
 
             return totalDePaginas;
         }
 
-        private bool UsuarioJaExiste(IDbConnection conexao, string usuario)
+        private async Task<bool> UsuarioJaExiste(IDbConnection conexao, string usuario)
         {
             var query = AlunoRepositoryQueries.ListarAlunoPorUsuario;
-            var existeUsuario = conexao.QuerySingleOrDefault<RetornoTurmaDto>(query, new { USUARIO = usuario }) != null;
+            var existeUsuario = await conexao.QuerySingleOrDefaultAsync<RetornoTurmaDto>(query, new { USUARIO = usuario }) != null;
             return existeUsuario;
         }
 
-        private bool UsuarioValido(IDbConnection conexao, string usuario)
+        private async Task<bool> UsuarioValido(IDbConnection conexao, string usuario)
         {
             var query = AlunoRepositoryQueries.ListarAlunoPorUsuario;
-            var usuarioValido = conexao.QuerySingleOrDefault<RetornoTurmaDto>(query, new { USUARIO = usuario }) != null;
+            var usuarioValido = await conexao.QuerySingleOrDefaultAsync<RetornoTurmaDto>(query, new { USUARIO = usuario }) != null;
             return usuarioValido;
         }
     }

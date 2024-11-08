@@ -15,37 +15,37 @@ namespace API.Services.Aluno
             _segurancaService = segurancaService;
         }
 
-        public int AtualizarAluno(CriacaoAtualizacaoAlunoDto model, string usuario)
+        public async Task<int> AtualizarAluno(CriacaoAtualizacaoAlunoDto model, string usuario)
         {
 
-            model.Senha = model.Senha.Length != 60 ? _segurancaService.ConverterStringEmHash(model.Senha) : model.Senha;
-            var alunoAtualizado = _alunoRepository.AtualizarAluno(model, usuario);
+            model.Senha = model.Senha.Length != 60 ? await _segurancaService.ConverterStringEmHash(model.Senha) : model.Senha;
+            var alunoAtualizado = await _alunoRepository.AtualizarAluno(model, usuario);
             return alunoAtualizado;
         }
 
-        public RetornoAlunoDto CriarAluno(CriacaoAtualizacaoAlunoDto model)
+        public async Task<RetornoAlunoDto> CriarAluno(CriacaoAtualizacaoAlunoDto model)
         {
-            model.Senha = _segurancaService.ConverterStringEmHash(model.Senha);
-            var aluno = _alunoRepository.CriarAluno(model);
+            model.Senha = await _segurancaService.ConverterStringEmHash(model.Senha);
+            var aluno = await _alunoRepository.CriarAluno(model);
 
             return aluno;
         }
 
-        public RetornoAlunoDto? ListarAlunoPorUsuario(string usuario)
+        public async Task<RetornoAlunoDto?> ListarAlunoPorUsuario(string usuario)
         {
-            var aluno = _alunoRepository.ListarAlunoPorUsuario(usuario);
+            var aluno = await _alunoRepository.ListarAlunoPorUsuario(usuario);
             return aluno;
         }
 
-        public RetornoTodosAlunosDto ListarTodosAlunos(int pagina, int registrosPorPagina)
+        public async Task<RetornoTodosAlunosDto> ListarTodosAlunos(int pagina, int registrosPorPagina)
         {
-            var listaAlunos = _alunoRepository.ListarTodosAlunos(pagina, registrosPorPagina);
+            var listaAlunos = await _alunoRepository.ListarTodosAlunos(pagina, registrosPorPagina);
             return listaAlunos;
         }
 
-        public int RemoverAluno(string usuario)
+        public async Task<int> RemoverAluno(string usuario)
         {
-            var alunoRemovido = _alunoRepository.RemoverAluno(usuario);
+            var alunoRemovido = await _alunoRepository.RemoverAluno(usuario);
             return alunoRemovido;
         }
     }

@@ -16,16 +16,16 @@ namespace API.Repositories.Turma
             _context = context;
         }
 
-        public int AtualizarTurma(CriacaoAtualizacaoTurmaDto model, int idTurma)
+        public async Task<int> AtualizarTurma(CriacaoAtualizacaoTurmaDto model, int idTurma)
         {
             using var _conexao = _context.ConexaoQuery();
 
-            if (!TurmaIdValida(_conexao, idTurma))
+            if (!await TurmaIdValida(_conexao, idTurma))
             {
                 return -2;
             }
 
-            if (TurmaJaExiste(_conexao, model.Turma, idTurma))
+            if (await TurmaJaExiste(_conexao, model.Turma, idTurma))
             {
                 return -1;
             }
@@ -41,7 +41,7 @@ namespace API.Repositories.Turma
                 { "ID", idTurma },
             };
 
-            var linhasAfetadas = _conexao.Execute(query, filtros, _transacao);
+            var linhasAfetadas = await _conexao.ExecuteAsync(query, filtros, _transacao);
 
             if (linhasAfetadas == 0)
             {
@@ -53,11 +53,11 @@ namespace API.Repositories.Turma
             return linhasAfetadas;
         }
 
-        public RetornoTurmaDto CriarTurma(CriacaoAtualizacaoTurmaDto model)
+        public async Task<RetornoTurmaDto> CriarTurma(CriacaoAtualizacaoTurmaDto model)
         {
             using var _conexao = _context.ConexaoQuery();
 
-            if (TurmaJaExiste(_conexao, model.Turma))
+            if (await TurmaJaExiste(_conexao, model.Turma))
             {
                 return new RetornoTurmaDto { Id = -1 };
             }
@@ -72,7 +72,7 @@ namespace API.Repositories.Turma
                 { "CURSO", model.CursoId },
             };
 
-            var idTurma = _conexao.ExecuteScalar<int>(query, filtros, _transacao);
+            var idTurma = await _conexao.ExecuteScalarAsync<int>(query, filtros, _transacao);
 
             if (idTurma <= 0)
             {
@@ -91,7 +91,7 @@ namespace API.Repositories.Turma
             };
         }
 
-        public RetornoTodasTurmasDto ListarTodasTurmas(int pagina, int registrosPorPagina)
+        public async Task<RetornoTodasTurmasDto> ListarTodasTurmas(int pagina, int registrosPorPagina)
         {
             var query = TurmaRepositoryQueries.ListarTurmasPorPagina;
             using var _conexao = _context.ConexaoQuery();
@@ -102,22 +102,22 @@ namespace API.Repositories.Turma
                 { "PAGINA", pagina }
             };
 
-            var listaTurmas = _conexao.Query<RetornoTurmaDto>(query, filtros).ToList();
+            var listaTurmas = (await _conexao.QueryAsync<RetornoTurmaDto>(query, filtros)).ToList();
 
             return new RetornoTodasTurmasDto()
             {
                 Pagina = pagina,
-                TotalParaPaginacao = ContagemTotalTurmas(registrosPorPagina),
+                TotalParaPaginacao = await ContagemTotalTurmas(registrosPorPagina),
                 Turmas = listaTurmas
             };
         }
 
-        public RetornoTurmaDto? ListarTurmaPorId(int id)
+        public async Task<RetornoTurmaDto?> ListarTurmaPorId(int id)
         {
             var query = TurmaRepositoryQueries.ListarTurmaPorId;
             using var _conexao = _context.ConexaoQuery();
 
-            var turmaRetorno = _conexao.QuerySingleOrDefault<RetornoTurmaDto>(query, new
+            var turmaRetorno = await _conexao.QuerySingleOrDefaultAsync<RetornoTurmaDto>(query, new
             {
                 ID = id
             });
@@ -125,11 +125,11 @@ namespace API.Repositories.Turma
             return turmaRetorno;
         }
 
-        public int RemoverTurma(int idTurma)
+        public async Task<int> RemoverTurma(int idTurma)
         {
             using var _conexao = _context.ConexaoQuery();
 
-            if (!TurmaIdValida(_conexao, idTurma))
+            if (!await TurmaIdValida(_conexao, idTurma))
             {
                 return -1;
             }
@@ -137,7 +137,7 @@ namespace API.Repositories.Turma
             var query = TurmaRepositoryQueries.RemoverTurma;
             using var _transacao = _conexao.BeginTransaction();
 
-            var linhasAfetadas = _conexao.Execute(query, new { ID = idTurma }, _transacao);
+            var linhasAfetadas = await _conexao.ExecuteAsync(query, new { ID = idTurma }, _transacao);
 
             if (linhasAfetadas == 0)
             {
@@ -149,18 +149,18 @@ namespace API.Repositories.Turma
             return linhasAfetadas;
         }
 
-        private int ContagemTotalTurmas(int registrosPorPagina)
+        private async Task<int> ContagemTotalTurmas(int registrosPorPagina)
         {
             var query = TurmaRepositoryQueries.ContagemTurmas;
             using var _conexao = _context.ConexaoQuery();
 
-            var totalRegistros = _conexao.ExecuteScalar<int>(query);
+            var totalRegistros = await _conexao.ExecuteScalarAsync<int>(query);
             var totalDePaginas = (int)Math.Ceiling((double)totalRegistros / registrosPorPagina);
 
             return totalDePaginas;
         }
 
-        private bool TurmaJaExiste(IDbConnection conexao, string turma, int idTurma = 0)
+        private async Task<bool> TurmaJaExiste(IDbConnection conexao, string turma, int idTurma = 0)
         {
             var query = TurmaRepositoryQueries.ListarTurmaPorTurma;
 
@@ -175,14 +175,14 @@ namespace API.Repositories.Turma
                 filtros.Add("ID", idTurma);
             }
             
-            var existeTurma = conexao.QuerySingleOrDefault<RetornoTurmaDto>(query, filtros) != null;
+            var existeTurma = await conexao.QuerySingleOrDefaultAsync<RetornoTurmaDto>(query, filtros) != null;
             return existeTurma;
         }
 
-        private bool TurmaIdValida(IDbConnection conexao, int idTurma)
+        private async Task<bool> TurmaIdValida(IDbConnection conexao, int idTurma)
         {
             var query = TurmaRepositoryQueries.ListarTurmaPorId;
-            var turmaIdValida = conexao.QuerySingleOrDefault<RetornoTurmaDto>(query, new { ID = idTurma }) != null;
+            var turmaIdValida = await conexao.QuerySingleOrDefaultAsync<RetornoTurmaDto>(query, new { ID = idTurma }) != null;
             return turmaIdValida;
         }
     }

@@ -4,10 +4,10 @@ namespace API.Services.Turma
 {
     public interface ITurmaService
     {
-        public RetornoTurmaDto CriarTurma(CriacaoAtualizacaoTurmaDto model);
-        public int AtualizarTurma(CriacaoAtualizacaoTurmaDto model, int idTurma);
-        public RetornoTurmaDto? ListarTurmaPorId(int idTurma);
-        public RetornoTodasTurmasDto ListarTodasTurmas(int pagina, int registrosPorPagina);
-        public int RemoverTurma(int idTurma);
+        public Task<RetornoTurmaDto> CriarTurma(CriacaoAtualizacaoTurmaDto model);
+        public Task<int> AtualizarTurma(CriacaoAtualizacaoTurmaDto model, int idTurma);
+        public Task<RetornoTurmaDto?> ListarTurmaPorId(int idTurma);
+        public Task<RetornoTodasTurmasDto> ListarTodasTurmas(int pagina, int registrosPorPagina);
+        public Task<int> RemoverTurma(int idTurma);
     }
 }

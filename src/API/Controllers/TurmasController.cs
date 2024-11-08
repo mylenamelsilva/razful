@@ -22,7 +22,7 @@ namespace API.Controllers
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(RetornoTurmaDto))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(List<string>))]
         [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(List<string>))]
-        public IActionResult CriarTurma(CriacaoAtualizacaoTurmaDto model)
+        public async Task<IActionResult> CriarTurma(CriacaoAtualizacaoTurmaDto model)
         {
             if (!ModelState.IsValid)
             {
@@ -34,7 +34,7 @@ namespace API.Controllers
                 return BadRequest(erros);
             }
 
-            var turma = _turmaService.CriarTurma(model);
+            var turma = await _turmaService.CriarTurma(model);
 
             return turma.Id switch
             {
@@ -47,23 +47,23 @@ namespace API.Controllers
         [HttpGet]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(RetornoTodasTurmasDto))]
-        public IActionResult ListarTurmas([FromQuery] int pagina = 1, [FromQuery] int registrosPorPagina = 10)
+        public async Task<IActionResult> ListarTurmas([FromQuery] int pagina = 1, [FromQuery] int registrosPorPagina = 10)
         {
-            return Ok(_turmaService.ListarTodasTurmas(pagina, registrosPorPagina));
+            return Ok(await _turmaService.ListarTodasTurmas(pagina, registrosPorPagina));
         }
 
         [HttpGet]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(RetornoTurmaDto))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public IActionResult ListarTurmaPorId([FromQuery] int idTurma)
+        public async Task<IActionResult> ListarTurmaPorId([FromQuery] int idTurma)
         {
             if (idTurma <= 0)
             {
                 return BadRequest(new List<string> { "ID de turma inválido." });
             }
 
-            var turmaRetorno = _turmaService.ListarTurmaPorId(idTurma);
+            var turmaRetorno = await _turmaService.ListarTurmaPorId(idTurma);
 
             return turmaRetorno != null ? Ok(turmaRetorno) : NotFound();
         }
@@ -73,7 +73,7 @@ namespace API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CriacaoAtualizacaoTurmaDto))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(List<string>))]
         [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(List<string>))]
-        public IActionResult AtualizarTurma(CriacaoAtualizacaoTurmaDto model, [FromQuery] int idTurma)
+        public async Task<IActionResult> AtualizarTurma(CriacaoAtualizacaoTurmaDto model, [FromQuery] int idTurma)
         {
             if (!ModelState.IsValid)
             {
@@ -90,7 +90,7 @@ namespace API.Controllers
                 return BadRequest(new List<string> { "ID de turma inválido." });
             }
 
-            var turmaRetorno = _turmaService.AtualizarTurma(model, idTurma);
+            var turmaRetorno = await _turmaService.AtualizarTurma(model, idTurma);
 
             return turmaRetorno switch
             {
@@ -106,9 +106,9 @@ namespace API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(List<string>))]
         [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(List<string>))]
-        public IActionResult RemoverTurma([FromQuery] int idTurma)
+        public async Task<IActionResult> RemoverTurma([FromQuery] int idTurma)
         {
-            var turmaRetorno = _turmaService.RemoverTurma(idTurma);
+            var turmaRetorno = await _turmaService.RemoverTurma(idTurma);
 
             return turmaRetorno switch
             {
