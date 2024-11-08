@@ -13,9 +13,9 @@ namespace API.Services.AlunoTurma
             _alunoTurmaRepository = alunoTurmaRepository;
         }
 
-        public Task<int> AtualizarAssociacao(CriacaoAtualizacaoAlunoTurmaDto model)
+        public async Task<int> AtualizarAssociacao(CriacaoAtualizacaoAlunoTurmaDto model, string turma)
         {
-            throw new NotImplementedException();
+            return await _alunoTurmaRepository.AtualizarAssociacao(model, turma);
         }
 
         public async Task<RetornoAlunoTurmaDto> CriarAssociacao(CriacaoAtualizacaoAlunoTurmaDto model)

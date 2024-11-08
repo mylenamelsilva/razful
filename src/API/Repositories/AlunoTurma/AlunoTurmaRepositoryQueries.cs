@@ -94,5 +94,16 @@
                 WHERE Turma_Id = (SELECT Id FROM [dbo].[Turma] WHERE Turma = @TURMA)
             ";
 
+        public static string ExisteUsuarioCadastradoNaTurma
+            = $@"
+                SELECT
+                    ALUNO.Id
+                 FROM [dbo].[Aluno_Turma] ALUNO_TURMA
+                     INNER JOIN [dbo].[Aluno] ALUNO ON ALUNO.Id = ALUNO_TURMA.Aluno_Id
+                     INNER JOIN [dbo].[Turma] TURMA ON TURMA.Id = ALUNO_TURMA.Turma_Id
+                WHERE ALUNO_TURMA.Turma_Id = (SELECT Id FROM [dbo].[Turma] WHERE Turma = @TURMA)
+                    AND Aluno_Id = (SELECT Id FROM [dbo].[Aluno] WHERE Usuario = @ALUNO)
+            ";
+
     }
 }

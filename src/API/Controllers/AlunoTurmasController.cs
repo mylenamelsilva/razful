@@ -39,15 +39,39 @@ namespace API.Controllers
             return turma.Sucesso switch
             {
                 0 => StatusCode(StatusCodes.Status500InternalServerError, new List<string> { "Houve um erro ao inserir a associação." }),
+                -1 => BadRequest("Turma/usuário inválido."),
+                -2 => BadRequest("Aluno já cadastrado na turma."),
                 _ => CreatedAtAction(nameof(CriarAssociacao), new { id = turma.Sucesso }, turma)
             };
         }
 
-        //[HttpPut]
-        //public async Task<IActionResult> AlterarAssociacao(CriacaoAtualizacaoAlunoTurmaDto model)
-        //{
+        [HttpPut]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CriacaoAtualizacaoAlunoTurmaDto))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(List<string>))]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(List<string>))]
+        public async Task<IActionResult> AtualizarAssociacao(CriacaoAtualizacaoAlunoTurmaDto model, [FromQuery] string turma)
+        {
+            if (!ModelState.IsValid)
+            {
+                var erros = ModelState.Values
+                .SelectMany(v => v.Errors)
+                .Select(e => e.ErrorMessage)
+                .ToList();
 
-        //}
+                return BadRequest(erros);
+            }
+
+            var aluno = await _alunoTurmaService.AtualizarAssociacao(model, turma);
+
+            return aluno switch
+            {
+                > 0 => Ok(model),
+                -1 => BadRequest("Turma/usuário inválido."),
+                -2 => BadRequest("Aluno já cadastrado na turma."),
+                _ => StatusCode(StatusCodes.Status500InternalServerError, "Erro ao atualizar a associação.")
+            };
+        }
 
         [HttpGet]
         [Produces("application/json")]

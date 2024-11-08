@@ -18,50 +18,59 @@ namespace API.Repositories.AlunoTurma
             _context = context;
         }
 
-        public Task<int> AtualizarAssociacao(CriacaoAtualizacaoAlunoTurmaDto model)
+        public async Task<int> AtualizarAssociacao(CriacaoAtualizacaoAlunoTurmaDto model, string turma)
         {
-            throw new NotImplementedException();
+            using var _conexao = _context.ConexaoQuery();
+
+            if (!await UsuarioValido(_conexao, model.Aluno) || model.Turma != turma)
+            {
+                return -1;
+            }
+
+            if (await UsuarioJaCadastradoNaTurma(_conexao, model.Aluno, model.Turma))
+            {
+                return -2;
+            }
+
+            var query = AlunoTurmaRepositoryQueries.CriarAssociacao;
+            using var _transacao = _conexao.BeginTransaction();
+
+            var linhasAfetadas = await _conexao.ExecuteAsync(query, new
+            {
+                USUARIO = model.Aluno,
+                TURMA = model.Turma
+            }, _transacao);
+
+            if (linhasAfetadas == 0)
+            {
+                _transacao.Rollback();
+                return linhasAfetadas;
+            }
+
+            _transacao.Commit();
+            return linhasAfetadas;
         }
-
-        //public async Task<int> AtualizarAssociacao(CriacaoAtualizacaoAlunoTurmaDto model)
-        //{
-        //    var query = AlunoTurmaRepositoryQueries.CriarAssociacao;
-        //    using var _conexao = _context.ConexaoQuery();
-        //    using var _transacao = _conexao.BeginTransaction();
-
-        //    var linhasAfetadas = await _conexao.ExecuteAsync(query, new
-        //    {
-        //        USUARIO = model.Aluno,
-        //        TURMA = model.Turma
-        //    }, _transacao);
-
-        //    if (linhasAfetadas == 0)
-        //    {
-        //        _transacao.Rollback();
-        //        return new RetornoAlunoTurmaDto();
-        //    }
-
-        //    _transacao.Commit();
-        //    return new RetornoAlunoTurmaDto()
-        //    {
-        //        Sucesso = 1,
-        //        Aluno = model.Aluno,
-        //        Turma = model.Turma
-        //    };
-        //}
 
         public async Task<RetornoAlunoTurmaDto> CriarAssociacao(CriacaoAtualizacaoAlunoTurmaDto model)
         {
             using var _conexao = _context.ConexaoQuery();
 
-            bool usuarioValido = !await UsuarioValido(_conexao, model.Aluno);
-            bool turmaValida = !await TurmaValida(_conexao, model.Turma);
+            bool usuarioValido = await UsuarioValido(_conexao, model.Aluno);
+            bool turmaValida = await TurmaValida(_conexao, model.Turma);
 
             if (!usuarioValido || !turmaValida)
             {
                 return new RetornoAlunoTurmaDto()
                 {
                     Sucesso = -1
+                };
+            }
+
+            if (await UsuarioJaCadastradoNaTurma(_conexao, model.Aluno, model.Turma))
+            {
+                return new RetornoAlunoTurmaDto()
+                {
+                    Sucesso = -2
                 };
             }
 
@@ -143,7 +152,7 @@ namespace API.Repositories.AlunoTurma
             var query = AlunoTurmaRepositoryQueries.RemoverAlunoAssociado;
             using var _transacao = _conexao.BeginTransaction();
 
-            var linhaAfetada = await _conexao.ExecuteAsync(query, new 
+            var linhaAfetada = await _conexao.ExecuteAsync(query, new
             {
                 TURMA = turma,
                 ALUNO = aluno
@@ -204,7 +213,7 @@ namespace API.Repositories.AlunoTurma
             var query = AlunoTurmaRepositoryQueries.ContagemAlunosAssociados;
             using var _conexao = _context.ConexaoQuery();
 
-            var totalRegistros = await _conexao.ExecuteScalarAsync<int>(query, new { TURMA = turma});
+            var totalRegistros = await _conexao.ExecuteScalarAsync<int>(query, new { TURMA = turma });
             var totalDePaginas = (int)Math.Ceiling((double)totalRegistros / registrosPorPagina);
 
             return totalDePaginas;
@@ -222,6 +231,13 @@ namespace API.Repositories.AlunoTurma
             var query = TurmaRepositoryQueries.ListarTurmaPorTurma;
             var usuarioValido = await conexao.QuerySingleOrDefaultAsync<RetornoTurmaDto>(query, new { TURMA = turma }) != null;
             return usuarioValido;
+        }
+
+        private async Task<bool> UsuarioJaCadastradoNaTurma(IDbConnection conexao, string usuario, string turma)
+        {
+            var query = AlunoTurmaRepositoryQueries.ExisteUsuarioCadastradoNaTurma;
+            var usuarioTurmaValido = await conexao.QuerySingleOrDefaultAsync<RetornoTurmaDto>(query, new { TURMA = turma, ALUNO = usuario }) != null;
+            return usuarioTurmaValido;
         }
     }
 }
