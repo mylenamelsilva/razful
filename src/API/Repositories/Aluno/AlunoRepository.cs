@@ -1,4 +1,5 @@
 ﻿using API.DTOs.Aluno;
+using API.DTOs.Turma;
 using API.Repositories._Base;
 using Dapper;
 using System.Data;
@@ -16,22 +17,19 @@ namespace API.Repositories.Aluno
 
         public int AtualizarAluno(CriacaoAtualizacaoAlunoDto model, string usuario)
         {
-            var query = AlunoRepositoryQueries.AtualizarAluno;
             using var _conexao = _context.ConexaoQuery();
 
-            var (existeAluno, usuarioRotaValida) = VerificarSeJaExisteUsuario(_conexao, model.Usuario, usuario, "atualizar");
-
-
-            if (usuarioRotaValida != null && usuarioRotaValida is false)
+            if (!UsuarioValido(_conexao, usuario))
             {
                 return -2;
             }
 
-            if (existeAluno)
+            if (UsuarioJaExiste(_conexao, model.Usuario) && model.Usuario != usuario)
             {
                 return -1;
             }
 
+            var query = AlunoRepositoryQueries.AtualizarAluno;
             using var _transacao = _conexao.BeginTransaction();
 
             var filtros = new Dictionary<string, object>()
@@ -42,33 +40,28 @@ namespace API.Repositories.Aluno
                 { "USUARIO_INICIAL", usuario },
             };
 
-            var alteracaoRealizada = _conexao.Execute(query, filtros, _transacao);
+            var linhaAfetada = _conexao.Execute(query, filtros, _transacao);
 
-            if (alteracaoRealizada == 0)
+            if (linhaAfetada == 0)
             {
                 _transacao.Rollback();
-                return alteracaoRealizada;
+                return linhaAfetada;
             }
 
             _transacao.Commit();
-            return alteracaoRealizada;
+            return linhaAfetada;
         }
 
         public RetornoAlunoDto CriarAluno(CriacaoAtualizacaoAlunoDto model)
         {
-            var query = AlunoRepositoryQueries.AdicionarAluno;
             using var _conexao = _context.ConexaoQuery();
 
-            var (existeAluno, _) = VerificarSeJaExisteUsuario(_conexao, model.Usuario, "", "criar");
-
-            if (existeAluno)
+            if (UsuarioJaExiste(_conexao, model.Usuario))
             {
-                return new RetornoAlunoDto()
-                {
-                    Id = -1
-                };
+                return new RetornoAlunoDto { Id = -1 };
             }
 
+            var query = AlunoRepositoryQueries.AdicionarAluno;
             using var _transacao = _conexao.BeginTransaction();
 
             var filtros = new Dictionary<string, object>()
@@ -102,10 +95,10 @@ namespace API.Repositories.Aluno
             var query = AlunoRepositoryQueries.ListarAlunoPorUsuario;
             using var _conexao = _context.ConexaoQuery();
 
-            var aluno = _conexao.Query<RetornoAlunoDto>(query, new
+            var aluno = _conexao.QuerySingleOrDefault<RetornoAlunoDto>(query, new
             {
                 USUARIO = usuario
-            }).FirstOrDefault();
+            });
 
             return aluno;
         }
@@ -133,28 +126,26 @@ namespace API.Repositories.Aluno
 
         public int RemoverAluno(string usuario)
         {
-            var query = AlunoRepositoryQueries.RemoverAluno;
             using var _conexao = _context.ConexaoQuery();
 
-            var (_, usuarioRotaValida) = VerificarSeJaExisteUsuario(_conexao, "", usuario, "atualizar");
-
-            if (usuarioRotaValida != null && usuarioRotaValida is false)
+            if (!UsuarioValido(_conexao, usuario))
             {
                 return -1;
             }
 
+            var query = AlunoRepositoryQueries.RemoverAluno;
             using var _transacao = _conexao.BeginTransaction();
 
-            var alunoRemovido = _conexao.Execute(query, new { USUARIO = usuario}, _transacao);
+            var linhaAfetada = _conexao.Execute(query, new { USUARIO = usuario}, _transacao);
 
-            if (alunoRemovido == 0)
+            if (linhaAfetada == 0)
             {
                 _transacao.Rollback();
-                return alunoRemovido;
+                return linhaAfetada;
             }
 
             _transacao.Commit();
-            return alunoRemovido;
+            return linhaAfetada;
         }
 
         private int ContagemTotalAlunos(int registrosPorPagina)
@@ -168,31 +159,18 @@ namespace API.Repositories.Aluno
             return totalDePaginas;
         }
 
-        private (bool, bool?) VerificarSeJaExisteUsuario(IDbConnection conexao, string usuarioAAtualizar, string usuarioRota, string operacao)
+        private bool UsuarioJaExiste(IDbConnection conexao, string usuario)
         {
-            var queryExisteAluno = AlunoRepositoryQueries.ListarAlunoPorUsuario;
+            var query = AlunoRepositoryQueries.ListarAlunoPorUsuario;
+            var existeUsuario = conexao.QuerySingleOrDefault<RetornoTurmaDto>(query, new { USUARIO = usuario }) != null;
+            return existeUsuario;
+        }
 
-            var existeUsuario = conexao.Query<RetornoAlunoDto>(queryExisteAluno, new
-            {
-                USUARIO = usuarioAAtualizar
-            }).FirstOrDefault();
-
-            if (operacao == "atualizar")
-            {
-                var usuarioValido = conexao.Query<RetornoAlunoDto>(queryExisteAluno, new
-                {
-                    USUARIO = usuarioRota
-                }).FirstOrDefault();
-
-                if (existeUsuario?.Usuario == usuarioValido?.Usuario)
-                {
-                    existeUsuario = null;
-                }
-
-                return (existeUsuario != null, usuarioValido != null);
-            }
-
-            return (existeUsuario != null, null);
+        private bool UsuarioValido(IDbConnection conexao, string usuario)
+        {
+            var query = AlunoRepositoryQueries.ListarAlunoPorUsuario;
+            var usuarioValido = conexao.QuerySingleOrDefault<RetornoTurmaDto>(query, new { USUARIO = usuario }) != null;
+            return usuarioValido;
         }
     }
 }

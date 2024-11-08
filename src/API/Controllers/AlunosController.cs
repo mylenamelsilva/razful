@@ -34,17 +34,12 @@ namespace API.Controllers
 
             var aluno = _alunoService.CriarAluno(model);
 
-            if (aluno.Id == 0)
+            return aluno.Id switch
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new List<string> { "Houve um erro ao inserir o aluno." });
-            }
-
-            if (aluno.Id == -1)
-            {
-                return BadRequest("Usuário já em uso.");
-            }
-
-            return CreatedAtAction(nameof(CriarAluno), new { id = aluno.Id }, aluno);
+                > 0 => CreatedAtAction(nameof(CriarAluno), new { id = aluno.Id }, aluno),
+                -1 => BadRequest("Usuário já em uso."),
+                _ => StatusCode(StatusCodes.Status500InternalServerError, "Erro ao inserir o aluno.")
+            };
         }
 
         [HttpGet]
@@ -63,12 +58,7 @@ namespace API.Controllers
         {
             var aluno = _alunoService.ListarAlunoPorUsuario(usuario);
 
-            if (aluno == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(aluno);
+            return aluno != null ? Ok(aluno) : NotFound();
         }
 
         [HttpPut]
@@ -90,22 +80,13 @@ namespace API.Controllers
 
             var aluno = _alunoService.AtualizarAluno(model, usuario);
 
-            if (aluno == 0)
+            return aluno switch
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new List<string> { "Houve um erro ao atualizar o aluno." });
-            }
-
-            if (aluno == -1)
-            {
-                return BadRequest("Usuário já em uso.");
-            }
-
-            if (aluno == -2)
-            {
-                return BadRequest("Usuário da rota ''/usuario='' não existente.");
-            }
-
-            return Ok(model);
+                > 0 => Ok(model),
+                -1 => BadRequest("Usuário já em uso."),
+                -2 => BadRequest("Usuário da rota ''/usuario='' não existente."),
+                _ => StatusCode(StatusCodes.Status500InternalServerError, "Erro ao atualizar o aluno.")
+            };
         }
 
         [HttpDelete]
@@ -117,17 +98,12 @@ namespace API.Controllers
         {
             var aluno = _alunoService.RemoverAluno(usuario);
 
-            if (aluno == 0)
+            return aluno switch
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new List<string> { "Houve um erro ao remover o aluno." });
-            }
-
-            if (aluno == -1)
-            {
-                return BadRequest("Usuário não existente.");
-            }
-
-            return Ok();
+                0 => StatusCode(StatusCodes.Status500InternalServerError, new List<string> { "Houve um erro ao remover o aluno." }),
+                -1 => BadRequest(new List<string> { "Usuário não existente." }),
+                _ => Ok()
+            };
         }
     }
 }

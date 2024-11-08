@@ -36,17 +36,12 @@ namespace API.Controllers
 
             var turma = _turmaService.CriarTurma(model);
 
-            if (turma.Id == 0)
+            return turma.Id switch
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new List<string> { "Houve um erro ao inserir a turma." });
-            }
-
-            if (turma.Id == -1)
-            {
-                return BadRequest("Turma já em uso.");
-            }
-
-            return CreatedAtAction(nameof(CriarTurma), new { id = turma.Id }, turma);
+                0 => StatusCode(StatusCodes.Status500InternalServerError, new List<string> { "Houve um erro ao inserir a turma." }),
+                -1 => BadRequest(new List<string> { "Turma já em uso." }),
+                _ => CreatedAtAction(nameof(CriarTurma), new { id = turma.Id }, turma)
+            };
         }
 
         [HttpGet]
@@ -63,14 +58,14 @@ namespace API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public IActionResult ListarTurmaPorId([FromQuery] int idTurma)
         {
-            var turmaRetorno = _turmaService.ListarTurmaPorId(idTurma);
-
-            if (turmaRetorno == null)
+            if (idTurma <= 0)
             {
-                return NotFound();
+                return BadRequest(new List<string> { "ID de turma inválido." });
             }
 
-            return Ok(turmaRetorno);
+            var turmaRetorno = _turmaService.ListarTurmaPorId(idTurma);
+
+            return turmaRetorno != null ? Ok(turmaRetorno) : NotFound();
         }
 
         [HttpPut]
@@ -90,24 +85,20 @@ namespace API.Controllers
                 return BadRequest(erros);
             }
 
+            if (idTurma <= 0)
+            {
+                return BadRequest(new List<string> { "ID de turma inválido." });
+            }
+
             var turmaRetorno = _turmaService.AtualizarTurma(model, idTurma);
 
-            if (turmaRetorno == 0)
+            return turmaRetorno switch
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new List<string> { "Houve um erro ao atualizar a turma." });
-            }
-
-            if (turmaRetorno == -1)
-            {
-                return BadRequest("Turma já em uso.");
-            }
-
-            if (turmaRetorno == -2)
-            {
-                return BadRequest("Turma da rota ''/turma='' não existente.");
-            }
-
-            return Ok(model);
+                0 => StatusCode(StatusCodes.Status500InternalServerError, new List<string> { "Houve um erro ao atualizar a turma." }),
+                -1 => BadRequest(new List<string> { "Turma já em uso." }),
+                -2 => BadRequest(new List<string> { "Turma da rota '/turma' não existente." }),
+                _ => Ok(model)
+            };
         }
 
         [HttpDelete]
@@ -119,17 +110,12 @@ namespace API.Controllers
         {
             var turmaRetorno = _turmaService.RemoverTurma(idTurma);
 
-            if (turmaRetorno == 0)
+            return turmaRetorno switch
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new List<string> { "Houve um erro ao remover a turma." });
-            }
-
-            if (turmaRetorno == -1)
-            {
-                return BadRequest("Turma não existente.");
-            }
-
-            return Ok();
+                0 => StatusCode(StatusCodes.Status500InternalServerError, new List<string> { "Houve um erro ao remover a turma." }),
+                -1 => BadRequest(new List<string> { "Turma não existente." }),
+                _ => Ok()
+            };
         }
     }
 }

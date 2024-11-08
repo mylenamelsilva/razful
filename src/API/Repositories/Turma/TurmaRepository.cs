@@ -18,21 +18,19 @@ namespace API.Repositories.Turma
 
         public int AtualizarTurma(CriacaoAtualizacaoTurmaDto model, int idTurma)
         {
-            var query = TurmaRepositoryQueries.AtualizarTurma;
             using var _conexao = _context.ConexaoQuery();
 
-            var (existeTurma, turmaRotaValida) = VerificarSeJaExisteTurma(_conexao, model.Turma, idTurma, "atualizar");
-
-            if (existeTurma)
-            {
-                return -1;
-            }
-
-            if (turmaRotaValida != null && turmaRotaValida is false)
+            if (!TurmaIdValida(_conexao, idTurma))
             {
                 return -2;
             }
 
+            if (TurmaJaExiste(_conexao, model.Turma, idTurma))
+            {
+                return -1;
+            }
+
+            var query = TurmaRepositoryQueries.AtualizarTurma;
             using var _transacao = _conexao.BeginTransaction();
 
             var filtros = new Dictionary<string, object>()
@@ -43,33 +41,28 @@ namespace API.Repositories.Turma
                 { "ID", idTurma },
             };
 
-            var alteracaoRealizada = _conexao.Execute(query, filtros, _transacao);
+            var linhasAfetadas = _conexao.Execute(query, filtros, _transacao);
 
-            if (alteracaoRealizada == 0)
+            if (linhasAfetadas == 0)
             {
                 _transacao.Rollback();
-                return alteracaoRealizada;
+                return linhasAfetadas;
             }
 
             _transacao.Commit();
-            return alteracaoRealizada;
+            return linhasAfetadas;
         }
 
         public RetornoTurmaDto CriarTurma(CriacaoAtualizacaoTurmaDto model)
         {
-            var query = TurmaRepositoryQueries.AdicionarTurma;
             using var _conexao = _context.ConexaoQuery();
 
-            var (existeTurma, _) = VerificarSeJaExisteTurma(_conexao, model.Turma, 0, "criar");
-
-            if (existeTurma)
+            if (TurmaJaExiste(_conexao, model.Turma))
             {
-                return new RetornoTurmaDto()
-                {
-                    Id = -1
-                };
+                return new RetornoTurmaDto { Id = -1 };
             }
 
+            var query = TurmaRepositoryQueries.AdicionarTurma;
             using var _transacao = _conexao.BeginTransaction();
 
             var filtros = new Dictionary<string, object>()
@@ -124,38 +117,36 @@ namespace API.Repositories.Turma
             var query = TurmaRepositoryQueries.ListarTurmaPorId;
             using var _conexao = _context.ConexaoQuery();
 
-            var turmaRetorno = _conexao.Query<RetornoTurmaDto>(query, new
+            var turmaRetorno = _conexao.QuerySingleOrDefault<RetornoTurmaDto>(query, new
             {
                 ID = id
-            }).FirstOrDefault();
+            });
 
             return turmaRetorno;
         }
 
         public int RemoverTurma(int idTurma)
         {
-            var query = TurmaRepositoryQueries.RemoverTurma;
             using var _conexao = _context.ConexaoQuery();
 
-            var (_, turmaRotaValida) = VerificarSeJaExisteTurma(_conexao, "", idTurma, "atualizar");
-
-            if (turmaRotaValida != null && turmaRotaValida is false)
+            if (!TurmaIdValida(_conexao, idTurma))
             {
                 return -1;
             }
 
+            var query = TurmaRepositoryQueries.RemoverTurma;
             using var _transacao = _conexao.BeginTransaction();
 
-            var turmaRemovida = _conexao.Execute(query, new { ID = idTurma }, _transacao);
+            var linhasAfetadas = _conexao.Execute(query, new { ID = idTurma }, _transacao);
 
-            if (turmaRemovida == 0)
+            if (linhasAfetadas == 0)
             {
                 _transacao.Rollback();
-                return turmaRemovida;
+                return linhasAfetadas;
             }
 
             _transacao.Commit();
-            return turmaRemovida;
+            return linhasAfetadas;
         }
 
         private int ContagemTotalTurmas(int registrosPorPagina)
@@ -169,28 +160,30 @@ namespace API.Repositories.Turma
             return totalDePaginas;
         }
 
-        private (bool, bool?) VerificarSeJaExisteTurma(IDbConnection conexao, string turmaAAtualizar, int idTurma, string operacao)
+        private bool TurmaJaExiste(IDbConnection conexao, string turma, int idTurma = 0)
         {
-            var queryExisteTurma = TurmaRepositoryQueries.ListarTurmaPorTurma;
+            var query = TurmaRepositoryQueries.ListarTurmaPorTurma;
 
-            var existeTurma = conexao.Query<RetornoTurmaDto>(queryExisteTurma, new
+            Dictionary<string, object> filtros = new()
             {
-                TURMA = turmaAAtualizar
-            }).FirstOrDefault();
+                { "TURMA", turma }
+            };
 
-            if (operacao == "atualizar")
+            if (idTurma > 0)
             {
-                var queryIdTurma = TurmaRepositoryQueries.ListarTurmaPorId;
-
-                var idTurmaValida = conexao.Query<RetornoTurmaDto>(queryIdTurma, new
-                {
-                    ID = idTurma
-                }).FirstOrDefault();
-
-                return (existeTurma != null, idTurmaValida != null);
+                query += "AND Id != @ID";
+                filtros.Add("ID", idTurma);
             }
+            
+            var existeTurma = conexao.QuerySingleOrDefault<RetornoTurmaDto>(query, filtros) != null;
+            return existeTurma;
+        }
 
-            return (existeTurma != null, null);
+        private bool TurmaIdValida(IDbConnection conexao, int idTurma)
+        {
+            var query = TurmaRepositoryQueries.ListarTurmaPorId;
+            var turmaIdValida = conexao.QuerySingleOrDefault<RetornoTurmaDto>(query, new { ID = idTurma }) != null;
+            return turmaIdValida;
         }
     }
 }
