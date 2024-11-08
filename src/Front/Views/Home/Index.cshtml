@@ -8,8 +8,8 @@
         <p class="d-flex justify-content-center">Escolha uma opção para configurar.</p>
         <div class="d-flex d-row justify-content-center gap-5 mt-4">
             <a asp-controller="AlunosHttp" asp-action="Index" asp-route-pagina="1" asp-route-registrosPorPagina="10" class="btn btn-primary w-25">Alunos</a>
-            <a asp-controller="TurmasHttp" asp-action="Index" class="btn btn-primary w-25">Turmas</a>
-            <a asp-controller="AlunoTurmas" asp-action="Index" class="btn btn-primary w-25">Associar alunos a turmas</a>
+            <a asp-controller="TurmasHttp" asp-action="Index" asp-route-pagina="1" asp-route-registrosPorPagina="10" class="btn btn-primary w-25">Turmas</a>
+            <a asp-controller="AlunoTurmasView" asp-action="Index" asp-route-pagina="1" asp-route-registrosPorPagina="10" class="btn btn-primary w-25">Associar alunos a turmas</a>
         </div>
    </section>
 </body>

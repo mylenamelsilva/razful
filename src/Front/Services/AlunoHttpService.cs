@@ -1,5 +1,5 @@
 ﻿using API.DTOs.Aluno;
-using Front.Models;
+using Front.Models.Aluno;
 
 namespace Front.Services
 {

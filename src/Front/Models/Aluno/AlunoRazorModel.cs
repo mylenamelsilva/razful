@@ -1,4 +1,4 @@
-﻿namespace Front.Models
+﻿namespace Front.Models.Aluno
 {
     public class AlunoRazorModel
     {

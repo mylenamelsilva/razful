@@ -1,4 +1,4 @@
-﻿namespace Front.Models
+﻿namespace Front.Models.Turma
 {
     public class TurmaRazorModel
     {
