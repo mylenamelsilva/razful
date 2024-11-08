@@ -1,7 +1,7 @@
 ﻿@model Front.Models.AlunoTurma.DropdownAlunoTurmaViewModel;
 
 @{
-    ViewData["Title"] = "Criar associação";
+    ViewData["Title"] = "Atualizar associação";
 }
 
 @if (TempData["Mensagem"] != null)
@@ -11,7 +11,7 @@
     </div>
 }
 
-<form asp-action="CriarAssociacao" method="post" class="needs-validation" novalidate>
+<form asp-action="AtualizarAssociacao" method="post" class="needs-validation" novalidate>
     <div class="form-group">
         <label for="Aluno">Aluno</label>
         <select asp-for="Aluno" class="form-control select-scroll" asp-items="Model.Alunos" required>

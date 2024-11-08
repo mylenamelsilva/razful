@@ -42,6 +42,22 @@ namespace Front.Controllers
             return View(alunoTurmaDropdown);
         }
 
+        [HttpGet("AtualizarAssociacao/{turma}")]
+        public async Task<IActionResult> AtualizarAssociacao([FromRoute] string turma)
+        {
+            var alunos = await _alunoService.ListarTodosAlunos(1, 500);
+            var turmas = await _turmaService.ListarTodasTurmas(1, 500);
+
+            var alunoTurmaDropdown = new DropdownAlunoTurmaViewModel()
+            {
+                Alunos = alunos?.Alunos.Select(a => new SelectListItem { Value = a.Usuario.ToString(), Text = a.Usuario }),
+                Turmas = turmas?.Turmas.Select(t => new SelectListItem { Value = t.Turma.ToString(), Text = t.Turma }),
+                Turma = turma
+            };
+
+            return View(alunoTurmaDropdown);
+        }
+
         [HttpGet]
         public async Task<IActionResult> ListarAlunosPorTurma(string turma, int pagina = 1, int registrosPorPagina = 10)
         {
@@ -92,6 +108,40 @@ namespace Front.Controllers
             }
         }
 
+        [HttpPost("AtualizarAssociacao/{turma}")]
+        public async Task<IActionResult> AtualizarAssociacao(CriacaoAtualizacaoAlunoTurmaDto req, [FromRoute] string turma)
+        {
+            if (!ModelState.IsValid)
+            {
+                var erros = ModelState.Values
+                    .SelectMany(v => v.Errors)
+                    .Select(e => e.ErrorMessage)
+                    .ToArray();
+
+                TempData["Erros"] = erros;
+                return RedirectToAction("AtualizarAssociacao");
+            }
+
+            try
+            {
+                var aluno = await _alunoTurmaService.AtualizarAssociacaoAsync(req, turma);
+
+                if (!string.IsNullOrEmpty(aluno.Erro))
+                {
+                    TempData["Mensagem"] = aluno.Erro;
+                    return RedirectToAction("AtualizarAssociacao");
+                }
+
+                TempData["Mensagem"] = "Associação atualizada.";
+                return RedirectToAction("Index");
+            }
+            catch
+            {
+                TempData["Mensagem"] = "Houve um erro ao atualizar a associação.";
+                return RedirectToAction("AtualizarAssociacao");
+            }
+        }
+
         [HttpPost]
         public async Task<IActionResult> RemoverAssociacao(string aluno, string turma)
         {
@@ -115,8 +165,8 @@ namespace Front.Controllers
             }
         }
 
-        [HttpPost]
-        public async Task<IActionResult> RemoverTodaAssociacao(string turma)
+        [HttpPost("RemoverTodaAssociacao/{turma}")]
+        public async Task<IActionResult> RemoverTodaAssociacao([FromRoute] string turma)
         {
             try
             {

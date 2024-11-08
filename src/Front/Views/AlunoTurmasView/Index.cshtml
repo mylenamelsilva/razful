@@ -29,7 +29,7 @@
             <p>Alunos: @turma.Alunos</p>
         </div>
         <div class="card-body">
-            <a asp-controller="AlunoTurmasView" asp-action="AtualizarTurma" asp-route-turma="@turma.Turma" class="btn btn-warning">Editar</a>
+            <a asp-controller="AlunoTurmasView" asp-action="AtualizarAssociacao" asp-route-turma="@turma.Turma" class="btn btn-warning">Editar</a>
             <a asp-controller="AlunoTurmasView" asp-action="ListarAlunosPorTurma" asp-route-turma="@turma.Turma" class="btn btn-dark">Visualizar alunos associados</a>
              <a onclick="excluirAssociacao('@Url.Action("RemoverTodaAssociacao", "AlunoTurmasView", new { turma = turma.Turma })')" class="btn btn-danger">Excluir toda a associação</a>
         </div>

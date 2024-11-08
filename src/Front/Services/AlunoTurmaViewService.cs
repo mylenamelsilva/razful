@@ -32,6 +32,16 @@ namespace Front.Services
                 : new AlunoTurmaViewModel() { Erro = await response.Content.ReadAsStringAsync() };
         }
 
+        public async Task<AlunoTurmaViewModel> AtualizarAssociacaoAsync(CriacaoAtualizacaoAlunoTurmaDto model, string turma)
+        {
+            var response = await _httpClient.PutAsJsonAsync($"AlunoTurmas/AtualizarAssociacao?turma={turma}", model);
+
+            return response.IsSuccessStatusCode
+                ? await response.Content.ReadFromJsonAsync<AlunoTurmaViewModel>()
+                : new AlunoTurmaViewModel() { Erro = await response.Content.ReadAsStringAsync() };
+        }
+
+
         public async Task<RetornoTodosAlunosDto> ListarAlunosPorTurmaAsync(string turma, int pagina = 1, int registrosPorPagina = 10)
         {
             var response = await _httpClient.GetAsync($"AlunoTurmas/ListarAlunosPorTurma?turma={turma}&pagina={pagina}&registrosPorPagina={registrosPorPagina}");

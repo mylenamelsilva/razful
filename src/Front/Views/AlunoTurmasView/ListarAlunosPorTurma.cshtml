@@ -44,7 +44,7 @@
             })
                 .then(response => {
                     if (response.ok) {
-                        location.reload();
+                        window.location.href = '/AlunoTurmasView/Index';
                     } else {
                         alert('Erro ao remover a associação.');
                     }
